@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -85,9 +84,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					log.Printf("client.GetTransactions failed: %v\n", err)
 					return
 				}
-				jsonTx, _ := json.Marshal(tx)
 				clientLock.Lock()
-				conn.WriteJSON(jsonTx)
+				conn.WriteJSON(tx)
 				clientLock.Unlock()
 			}
 		}()
