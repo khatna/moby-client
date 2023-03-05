@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "github.com/khatna/moby-listener/proto";
+
+service TxHandler {
+    // Get a stream of transactions with a greater value than
+    // float argument
+    rpc GetTransactions(Value) returns (stream Tx);
+}
+
+// Basic transaction message
+message Tx {
+    string txid = 1;
+    string from = 2;
+    string to = 3;
+    float value = 4;
+}
+
+message Value {
+    float value = 1;
+}
