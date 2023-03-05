@@ -96,5 +96,5 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Start HTTP server
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("WS_PORT"), nil))
+	log.Fatal(http.ListenAndServeTLS(":"+os.Getenv("WS_PORT"), "server.pem", "server.key", nil))
 }
