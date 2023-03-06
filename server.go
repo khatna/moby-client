@@ -92,9 +92,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Test route
+func helloServer(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte("This is an example server.\n"))
+}
+
 // start a server
 func main() {
 	// Start HTTP server
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/hello", helloServer)
 	log.Fatal(http.ListenAndServeTLS(":"+os.Getenv("WS_PORT"), "server.pem", "server.key", nil))
 }
