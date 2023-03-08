@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
@@ -9,10 +10,10 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
+	pb "github.com/khatna/moby-client/proto"
+	"golang.org/x/crypto/acme/autocert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	pb "github.com/khatna/moby-client/proto"
 )
 
 // HTTP Protocol
@@ -100,8 +101,22 @@ func helloServer(w http.ResponseWriter, req *http.Request) {
 
 // start a server
 func main() {
-	// Start HTTP server
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/hello", helloServer)
-	log.Fatal(http.ListenAndServeTLS(":"+os.Getenv("WS_PORT"), "server.pem", "server.key", nil))
+
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(os.Getenv("SSL_CN")),
+		Cache:      autocert.DirCache("certs"),
+	}
+
+	server := &http.Server{
+		Addr: ":" + os.Getenv("TLS_PORT"),
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+	}
+
+	go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+	log.Fatal(server.ListenAndServeTLS("", ""))
 }
